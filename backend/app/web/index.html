@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CamaraDOC - Painel</title>
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <main class="layout">
+      <header class="hero">
+        <p class="eyebrow">Gestao documental institucional</p>
+        <h1>CamaraDOC</h1>
+        <p class="subtitle">
+          OCR, organizacao e consulta segura de acervo para Camaras Municipais.
+        </p>
+      </header>
+
+      <section id="login-card" class="card">
+        <h2>Acesso administrativo</h2>
+        <form id="login-form" class="stack">
+          <label>
+            E-mail
+            <input type="email" id="login-email" required />
+          </label>
+          <label>
+            Senha
+            <input type="password" id="login-password" required />
+          </label>
+          <button type="submit">Entrar</button>
+        </form>
+      </section>
+
+      <section id="app-card" class="card hidden">
+        <div class="toolbar">
+          <div>
+            <h2>Painel administrativo</h2>
+            <p class="muted">Operacoes para acervo, setores e tipos.</p>
+            <p class="muted">Perfil atual: <span id="current-role">-</span></p>
+          </div>
+          <button id="logout-btn" class="ghost">Sair</button>
+        </div>
+
+        <div id="stats-card" class="stats box">
+          <strong>Total de documentos: <span id="stats-total">0</span></strong>
+          <span id="stats-ocr" class="muted"></span>
+        </div>
+
+        <nav class="tabs">
+          <button class="tab active" data-tab="documents">Documentos</button>
+          <button class="tab" data-tab="sectors">Setores</button>
+          <button class="tab" data-tab="types">Tipos</button>
+          <button class="tab admin-only hidden" data-tab="users">Usuarios</button>
+          <button class="tab admin-only hidden" data-tab="audit">Auditoria</button>
+        </nav>
+
+        <section id="tab-documents" class="tab-panel active">
+          <div class="grid">
+            <form id="document-search-form" class="box stack">
+              <h3>Busca</h3>
+              <label>
+                Busca textual
+                <input type="text" id="search-q" placeholder="titulo, assunto, texto..." />
+              </label>
+              <label>
+                Numero
+                <input type="text" id="search-number" />
+              </label>
+              <label>
+                Ano
+                <input type="number" id="search-year" />
+              </label>
+              <label>
+                Titulo
+                <input type="text" id="search-title" />
+              </label>
+              <label>
+                Assunto
+                <input type="text" id="search-subject" />
+              </label>
+              <label>
+                Autor/Origem
+                <input type="text" id="search-author-origin" />
+              </label>
+              <label>
+                Tipo
+                <select id="search-document-type">
+                  <option value="">Todos</option>
+                </select>
+              </label>
+              <label>
+                Setor
+                <select id="search-sector">
+                  <option value="">Todos</option>
+                </select>
+              </label>
+              <label>
+                OCR
+                <select id="search-ocr-status">
+                  <option value="">Todos</option>
+                  <option value="pending">pending</option>
+                  <option value="processing">processing</option>
+                  <option value="done">done</option>
+                  <option value="error">error</option>
+                </select>
+              </label>
+              <label>
+                Nivel de acesso
+                <select id="search-access-level">
+                  <option value="">Todos</option>
+                  <option value="publico">publico</option>
+                  <option value="interno">interno</option>
+                  <option value="restrito">restrito</option>
+                </select>
+              </label>
+              <button type="submit">Filtrar documentos</button>
+            </form>
+
+            <form id="upload-form" class="box stack" enctype="multipart/form-data">
+              <h3>Upload de PDF</h3>
+              <label>
+                Titulo
+                <input type="text" name="title" required />
+              </label>
+              <label>
+                Tipo de documento
+                <select name="document_type_id" id="upload-document-type" required></select>
+              </label>
+              <label>
+                Setor
+                <select name="sector_id" id="upload-sector" required></select>
+              </label>
+              <label>
+                Numero
+                <input type="text" name="number" />
+              </label>
+              <label>
+                Ano
+                <input type="number" name="year" />
+              </label>
+              <label>
+                Data do documento
+                <input type="date" name="document_date" />
+              </label>
+              <label>
+                Autor/Origem
+                <input type="text" name="author_origin" />
+              </label>
+              <label>
+                Assunto
+                <input type="text" name="subject" />
+              </label>
+              <label>
+                Palavras-chave
+                <input type="text" name="keywords" />
+              </label>
+              <label>
+                Nivel de acesso
+                <select name="access_level">
+                  <option value="interno">interno</option>
+                  <option value="publico">publico</option>
+                  <option value="restrito">restrito</option>
+                </select>
+              </label>
+              <label>
+                Arquivo PDF
+                <input type="file" name="file" accept="application/pdf" required />
+              </label>
+              <button type="submit">Enviar documento</button>
+            </form>
+          </div>
+
+          <div class="box">
+            <h3>Documentos cadastrados</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Titulo</th>
+                    <th>Numero/Ano</th>
+                    <th>Tipo</th>
+                    <th>Setor</th>
+                    <th>Status</th>
+                    <th>OCR</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+                <tbody id="documents-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-sectors" class="tab-panel">
+          <div class="grid">
+            <form id="sector-form" class="box stack">
+              <h3>Novo setor</h3>
+              <label>
+                Nome
+                <input type="text" id="sector-name" required />
+              </label>
+              <label>
+                Descricao
+                <input type="text" id="sector-description" />
+              </label>
+              <button type="submit">Cadastrar setor</button>
+            </form>
+
+            <div class="box">
+              <h3>Setores</h3>
+              <ul id="sectors-list" class="list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-types" class="tab-panel">
+          <div class="grid">
+            <form id="type-form" class="box stack">
+              <h3>Novo tipo</h3>
+              <label>
+                Nome
+                <input type="text" id="type-name" required />
+              </label>
+              <label>
+                Descricao
+                <input type="text" id="type-description" />
+              </label>
+              <button type="submit">Cadastrar tipo</button>
+            </form>
+
+            <div class="box">
+              <h3>Tipos de documento</h3>
+              <ul id="types-list" class="list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-users" class="tab-panel">
+          <div class="box">
+            <h3>Usuarios</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Perfil</th>
+                    <th>Status</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-audit" class="tab-panel">
+          <div class="box stack">
+            <h3>Auditoria (ultimos eventos)</h3>
+            <form id="audit-filter-form" class="grid">
+              <label>
+                Acao
+                <input type="text" id="audit-action" placeholder="ex: document.download" />
+              </label>
+              <label>
+                Entidade
+                <input type="text" id="audit-entity" placeholder="ex: document" />
+              </label>
+              <button type="submit">Filtrar auditoria</button>
+            </form>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data/Hora</th>
+                    <th>Usuario</th>
+                    <th>Perfil</th>
+                    <th>Acao</th>
+                    <th>Entidade</th>
+                    <th>ID</th>
+                    <th>IP</th>
+                  </tr>
+                </thead>
+                <tbody id="audit-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <aside id="flash" class="flash hidden"></aside>
+
+    <script src="/web/app.js"></script>
+  </body>
+</html>

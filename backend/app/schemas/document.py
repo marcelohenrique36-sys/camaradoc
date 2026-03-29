@@ -18,6 +18,21 @@ class DocumentCreate(BaseModel):
     notes: Optional[str] = None
 
 
+class DocumentUpdate(BaseModel):
+    title: Optional[str] = None
+    document_type_id: Optional[int] = None
+    number: Optional[str] = None
+    year: Optional[int] = None
+    document_date: Optional[date] = None
+    sector_id: Optional[int] = None
+    author_origin: Optional[str] = None
+    subject: Optional[str] = None
+    keywords: Optional[str] = None
+    access_level: Optional[str] = None
+    status: Optional[str] = None
+    notes: Optional[str] = None
+
+
 class DocumentOut(BaseModel):
     id: int
     title: str
@@ -36,6 +51,7 @@ class DocumentOut(BaseModel):
     ocr_file_path: Optional[str] = None
     extracted_text: Optional[str] = None
     ocr_status: str
+    ocr_error: Optional[str] = None
     created_by: int
     created_at: datetime
     updated_at: datetime

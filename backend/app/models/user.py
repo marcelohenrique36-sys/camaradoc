@@ -8,6 +8,7 @@ class User(SQLModel, table=True):
     name: str
     email: str = Field(index=True, unique=True)
     password_hash: str
+    role: str = Field(default="consulta_interna", index=True)
     is_admin: bool = False
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.utcnow)

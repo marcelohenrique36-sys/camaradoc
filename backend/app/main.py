@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from sqlmodel import select
 
 from app.core.config import settings
-from app.core.database import init_db, get_session
+from app.core.database import get_session, init_db
 from app.core.security import get_password_hash
 from app.models import User
 from app.services.file_service import ensure_directories
@@ -12,6 +15,7 @@ from app.api.routes.auth import router as auth_router
 from app.api.routes.sectors import router as sectors_router
 from app.api.routes.document_types import router as document_types_router
 from app.api.routes.documents import router as documents_router
+from app.api.routes.audit_logs import router as audit_logs_router
 
 
 @asynccontextmanager
@@ -22,14 +26,15 @@ async def lifespan(app: FastAPI):
     session = next(get_session())
     try:
         admin = session.exec(
-            select(User).where(User.email == "admin@camaradoc.local")
+            select(User).where(User.email == settings.DEFAULT_ADMIN_EMAIL)
         ).first()
 
         if not admin:
             admin = User(
                 name="Administrador",
-                email="admin@camaradoc.local",
-                password_hash=get_password_hash("123456"),
+                email=settings.DEFAULT_ADMIN_EMAIL,
+                password_hash=get_password_hash(settings.DEFAULT_ADMIN_PASSWORD),
+                role="admin",
                 is_admin=True,
             )
             session.add(admin)
@@ -46,6 +51,10 @@ app.include_router(auth_router)
 app.include_router(sectors_router)
 app.include_router(document_types_router)
 app.include_router(documents_router)
+app.include_router(audit_logs_router)
+
+web_dir = Path(__file__).resolve().parent / "web"
+app.mount("/web", StaticFiles(directory=web_dir), name="web")
 
 
 @app.get("/")
@@ -56,3 +65,8 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/admin")
+def admin():
+    return FileResponse(web_dir / "index.html")

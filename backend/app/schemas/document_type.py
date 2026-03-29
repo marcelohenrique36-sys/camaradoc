@@ -7,6 +7,12 @@ class DocumentTypeCreate(BaseModel):
     description: Optional[str] = None
 
 
+class DocumentTypeUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    is_active: Optional[bool] = None
+
+
 class DocumentTypeOut(BaseModel):
     id: int
     name: str
