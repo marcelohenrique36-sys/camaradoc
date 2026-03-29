@@ -1,20 +1,27 @@
-FROM python:3.12-slim
+# Usamos a imagem oficial e leve do Python
+FROM python:3.11-slim
 
+# Variáveis para o Python não criar arquivos .pyc e cuspir os logs em tempo real
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /app
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       ocrmypdf \
-       tesseract-ocr-por \
-       poppler-utils \
+# Instala as dependências reais de sistema para o OCRmyPDF e para o PostgreSQL
+RUN apt-get update && apt-get install -y \
+    ocrmypdf \
+    tesseract-ocr-por \
+    libpq-dev \
+    gcc \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Define a pasta de trabalho dentro do container
+WORKDIR /app
 
-COPY worker.py /app/worker.py
+# Copia as dependências e instala
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "/app/worker.py"]
+# Copia o nosso código
+COPY worker.py .
+
+# Roda o worker
+CMD ["python", "worker.py"]
